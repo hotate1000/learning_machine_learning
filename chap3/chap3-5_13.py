@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt;
 from sklearn.model_selection import train_test_split;
 from sklearn import svm;
 from sklearn.metrics import accuracy_score;
+import numpy as np;
+from matplotlib.colors import ListedColormap;
 
 X, y = make_blobs(
     random_state=0,
@@ -74,4 +76,28 @@ plt.scatter(df1[0], df1[1], color="r", alpha=0.5);
 plt.scatter([1], [3], color="b", marker="x", s=300);
 plt.scatter([1], [2], color="r", marker="x", s=300);
 plt.title("predict");
-plt.show();
+# plt.show();
+
+
+def plot_boundary(model, X, Y, target, xlabel, ylabel):
+    cmap_dots = ListedColormap(["#1f77b4", "#ff7f0e", "#2ca02c"]);
+    cmap_files = ListedColormap(["#c6dcec", "#ffdec2", "#cae7ca"]);
+
+    plt.figure(figsize=(5,5));
+    if model:
+        XX, YY = np.meshgrid(
+            np.linspace(X.min()-1, X.max()+1, 200),
+            np.linspace(Y.min()-1, Y.max()+1, 200));
+        pred = model.predict(np.c_[XX.ravel(), YY.ravel()]).reshape(XX.shape);
+        plt.pcolormesh(XX, YY, pred, cmap=cmap_files,shading="auto");
+        plt.contour(XX, YY, pred, colors="gray");
+    plt.scatter(X, Y, c=target, cmap=cmap_dots);
+    plt.xlabel(xlabel);
+    plt.ylabel(ylabel);
+    plt.show();
+
+
+df=pd.DataFrame(X_test);
+pred = model.predict(X_test);
+
+plot_boundary(model, df[0], df[1], pred, "df[0]", "df[1]");
