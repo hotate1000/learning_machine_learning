@@ -77,9 +77,9 @@ import matplotlib.pyplot as plt;
 from matplotlib.colors import ListedColormap;
 
 def plot_boundary(model, x, y, target, xlabel, ylabel):
-    cmap_dots = ListedColormap(["#1f77b4", "#ff7f0e", "#cae7ca"]);
+    cmap_dots = ListedColormap(["#1f77b4", "#ff7f0e", "#2ca02c"]);
     cmap_fills = ListedColormap(["#c6dcec", "#ffdec2", "#cae7ca"]);
-    # plt.figure(figsize=(5, 5));
+    plt.figure(figsize=(5, 5));
     if model:
         XX, YY = np.meshgrid(
             np.linspace(x.min()-1, x.max()+1, 200),
@@ -88,10 +88,10 @@ def plot_boundary(model, x, y, target, xlabel, ylabel):
         pred = model.predict(np.c_[XX.ravel(), YY.ravel()]).reshape(XX.shape);
         plt.pcolormesh(XX, YY, pred, cmap=cmap_fills, shading="auto");
         plt.contour(XX, YY, pred, cmap="gray");
-        plt.scatter(x, y, c=target, cmap=cmap_dots);
-        plt.xlabel(xlabel);
-        plt.ylabel(ylabel);
-        plt.show();
+    plt.scatter(x, y, c=target, cmap=cmap_dots);
+    plt.xlabel(xlabel);
+    plt.ylabel(ylabel);
+    plt.show();
 
 from sklearn.datasets import make_blobs;
 
@@ -106,7 +106,7 @@ x, y = make_blobs(
 df = pd.DataFrame(x);
 # print(df.head());
 # print(y);
-plot_boundary(None, df[0], df[1], y, "df[0]", "df[1]");
+# plot_boundary(None, df[0], df[1], y, "df[0]", "df[1]");
 
 from sklearn.model_selection import train_test_split;
 from sklearn.linear_model import LogisticRegression;
@@ -119,7 +119,41 @@ model.fit(X_train, Y_train);
 
 pred = model.predict(X_test);
 score = accuracy_score(Y_test, pred);
-print("正解率:", score*100, "%");
+# print("正解率:", score*100, "%");
 
 df = pd.DataFrame(X_test);
-plot_boundary(model, df[0], df[1], Y_test, "df[0]", "df[1]");
+# plot_boundary(model, df[0], df[1], Y_test, "df[0]", "df[1]");
+
+
+from sklearn import svm;
+
+X, Y = make_blobs(
+    random_state=4,
+    n_features=2,
+    centers=3,
+    cluster_std=2,
+    n_samples=500
+)
+
+x_train, x_test, y_train, y_test = train_test_split(X,Y,random_state=0);
+
+model=svm.SVC(kernel="linear");
+model.fit(x_train, y_train);
+
+pred=model.predict(x_test);
+score = accuracy_score(y_test, pred)
+
+# print("正解率：", score*100, "%");
+
+df = pd.DataFrame(x_test);
+# plot_boundary(model, df[0], df[1], y_test, "df[0]", "df[1]");
+
+model = svm.SVC(kernel="rbf", gamma="scale");
+model.fit(x_train, y_train);
+
+pred = model.predict(x_test);
+score = accuracy_score(y_test, pred);
+print("正解率：", score*100, "%");
+
+df = pd.DataFrame(x_test);
+plot_boundary(model, df[0], df[1], y_test, "df[0]", "df[1]");
